@@ -7,16 +7,15 @@ A. The algorithm: WFC algorithm (originated by Maxim Gumin) is based on randomne
 B. The library of valid connections: the possibility of interconnection is vast and easily buggy. Some techniques are applied to streamline the making of the library:
    1. The technique of pixelating the interconnections: (images below: a random floor plan of a bedroom and its pixelation). Therefore, a case of interconnection is abstracted as a quadrant with a color value at each corner.
 
-      ![Random floor plan of a bedroom](img/10.png)
-      ![Pixelation of the floor plan](img/11.png)
-
+   <img src="img/10.png" alt="Random floor plan of a bedroom" width="400"/><br>
+    <img src="img/11.png" alt="Pixelation of the floor plan" width="400"/><br>
    2. Library automatically generated from samples. It can be considered as a machine learning process. There is the risk of not being able to exhaust all possibilities. But it avoids mistakes by manual operation.
 
-      ![Valid connections in a bedroom, manually defined](img/12.png)
-      *Valid connections in a bedroom, manually defined.*
+![Valid connections in a bedroom, manually defined](img/12.png)
+*Valid connections in a bedroom, manually defined.*
 
-      ![Samples of a kitchen from which a library is extracted](img/13.png)
-      *Samples of a kitchen, from which a library of valid connections and their frequency in kitchens is extracted.*
+![Samples of a kitchen from which a library is extracted](img/13.png)
+*Samples of a kitchen, from which a library of valid connections and their frequency in kitchens is extracted.*
 
 C. A selection of size of grid: the size of the grid greatly affects the expensiveness of the generation. Efficiency and details are not to be achieved at the same time. Instead of using a conventional grid of 20cm or 30cm, I use a grid of 55cm. Despite being quick, the dimension of 55cm is the width between two arms of a person that has to do with the depth of wardrobe, the narrow passage in the room, and the depth of counters.
 
