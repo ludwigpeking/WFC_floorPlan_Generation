@@ -1,0 +1,239 @@
+1
+00:00:00,900 --> 00:00:06,922
+今天给大家介绍我在 2022 年做的一项独立研究：一种用计算机生成住宅平面的方法。
+Today I'd like to introduce an independent study I did in 2022: a way of generating apartment floor plans by computer.
+
+2
+00:00:07,372 --> 00:00:11,865
+核心算法，叫做波函数坍缩，英文缩写是 WFC。
+The core algorithm is called wave function collapse — WFC for short.
+
+3
+00:00:14,365 --> 00:00:21,262
+这种算法，由马克西姆·古敏提出。它只依靠两样东西：随机，和相邻单元之间的局部约束。
+The algorithm was proposed by Maxim Gumin. It relies on only two things: randomness, and local constraints between neighbouring cells.
+
+4
+00:00:21,712 --> 00:00:25,108
+所以它不依赖已有的经验，可以产生全新的设计。
+So it does not depend on past experience, and can produce entirely new designs.
+
+5
+00:00:25,558 --> 00:00:30,786
+从最基本的家具和人体工程的逻辑出发，自下而上，生成整个平面。
+Starting from the basic logic of furniture and ergonomics, it generates the whole plan from the bottom up.
+
+6
+00:00:32,686 --> 00:00:37,263
+波函数坍缩算法，不善于解决大、而且特定性强的网格。
+Wave function collapse is not good at large grids with highly specific requirements.
+
+7
+00:00:37,263 --> 00:00:40,742
+在我们的场合下，效率和细节，不可兼得。
+In our case, efficiency and detail cannot both be had.
+
+8
+00:00:41,192 --> 00:00:43,537
+网格选择在此，是相当关键的问题。
+So the choice of grid is a crucial question here.
+
+9
+00:00:43,537 --> 00:00:48,522
+我没有用常见的 20 厘米或 30 厘米网格，而是选了 55 厘米。
+Instead of the usual 20 or 30 cm grid, I chose 55 cm.
+
+10
+00:00:48,972 --> 00:00:55,934
+这是一个人站立时包含两臂的宽度，也接近衣柜的进深、最窄的过道，以及橱柜台面的深度。
+That is the width of a standing person including both arms — and close to the depth of a wardrobe, the narrowest passage, and the depth of a kitchen counter.
+
+11
+00:00:56,384 --> 00:01:03,069
+在这种网格下，墙的厚度四舍五入算作零个格子；而门，四舍五入变成两格宽。
+On this grid, wall thickness rounds to zero cells, and a door rounds to two cells wide.
+
+12
+00:01:04,969 --> 00:01:07,962
+我采用的方法，先要把平面图变成像素。
+The method I use first turns the plan into pixels.
+
+13
+00:01:08,412 --> 00:01:15,546
+床、衣柜、过道、门、窗，每个格子得到一个编码，也就是一种颜色。
+Bed, wardrobe, passage, door, window: every cell gets a code, which is to say a colour.
+
+14
+00:01:15,996 --> 00:01:21,309
+任意相邻的四个格子，组成一块拼图：四个角，各带一种颜色。
+Any four neighbouring cells form one tile: four corners, each carrying a colour.
+
+15
+00:01:23,209 --> 00:01:26,775
+连接的可能性非常多，手工定义很容易出错。
+The possible connections are vast, and defining them by hand is easily buggy.
+
+16
+00:01:27,224 --> 00:01:32,898
+所以，连接库是从样本里自动提取的。这可以看作一种机器学习。
+So the library of connections is extracted automatically from samples. It can be seen as a kind of machine learning.
+
+17
+00:01:32,898 --> 00:01:36,811
+不过，样本库的完善度，会对生成产生局限。
+However, how complete the sample library is limits what can be generated.
+
+18
+00:01:37,261 --> 00:01:43,239
+19 个卧室样本，给出 179 种拼接，以及每一种出现的频率。
+Nineteen bedroom samples yield 179 connections, and how often each one occurs.
+
+19
+00:01:45,739 --> 00:01:50,319
+一个房间的生成，从一扇门开始，因为一个房间总会有入口。
+Generating a room starts from a door, because a room always has an entrance.
+
+20
+00:01:50,319 --> 00:01:53,033
+在这个确定的位置上，就首先坍缩。
+That position is certain, so it collapses first.
+
+21
+00:01:53,483 --> 00:01:58,658
+其他的位置，还处于“叠加态”，但是我们可以计算它们的熵。
+The other positions are still in superposition, but we can compute their entropy.
+
+22
+00:01:58,658 --> 00:02:04,018
+这里的熵，是一个信息论的概念：可能性越集中的位置，熵越低。
+Entropy here is a concept from information theory: the more concentrated the possibilities at a position, the lower its entropy.
+
+23
+00:02:04,468 --> 00:02:10,779
+每一步，计算所有待定位置的熵，让熵最低的那一个，坍缩成一块合法的拼图。
+At each step the entropy of every open position is computed, and the one with the lowest entropy collapses into a valid tile.
+
+24
+00:02:10,779 --> 00:02:15,467
+如果有若干位置的熵相等，就让其中一个随机的位置坍缩。
+If several positions tie, one of them is chosen at random.
+
+25
+00:02:15,917 --> 00:02:18,914
+走进无解的死路，就推倒再来。
+A dead end with no solution means starting over.
+
+26
+00:02:19,364 --> 00:02:23,976
+绝大多数尝试会失败。只有较小的几率，一个房间闭合了。
+Most attempts fail. Only with a small probability does a room close.
+
+27
+00:02:29,476 --> 00:02:34,241
+闭合的房间，接着要打分。评分是几个方面的加权。
+A closed room is then scored. The score is a weighted sum of several aspects.
+
+28
+00:02:34,691 --> 00:02:37,710
+其一，周长与面积之比，越小越好。
+First, the ratio of perimeter to area: the smaller the better.
+
+29
+00:02:37,710 --> 00:02:41,673
+这引导房间尽量方正，但是这不是唯一的标准。
+This steers a room towards a compact, square shape — but it is not the only criterion.
+
+30
+00:02:42,123 --> 00:02:48,108
+其二，面积合理。面积的分数先升后降：超过合适的大小，分数就回落。
+Second, a reasonable area. The area score rises, then falls: past a suitable size it drops again.
+
+31
+00:02:48,108 --> 00:02:51,662
+高档住宅的空间比较宽松，回落得慢一些。
+Upscale housing is more generous with space, so its score drops more slowly.
+
+32
+00:02:52,112 --> 00:02:56,389
+其三，储物空间，这是越多越好，但边际收益递减。
+Third, storage: the more the better, with diminishing returns.
+
+33
+00:03:00,489 --> 00:03:05,387
+卧室、卫生间、厨房、客厅，各自生成，各自评分。
+Bedroom, bathroom, kitchen, living room: each is generated and scored on its own.
+
+34
+00:03:05,387 --> 00:03:07,942
+客厅会是整个户型的枢纽。
+The living room becomes the hub of the whole apartment.
+
+35
+00:03:08,392 --> 00:03:14,138
+高分的房间被留下，接到客厅预留的开口上，拼成一套完整的住宅。
+The high-scoring rooms are kept and attached to the openings reserved in the living room, forming a complete apartment.
+
+36
+00:03:14,138 --> 00:03:18,926
+全套住宅的评分，是各个房间得分，和体形系数的加权。
+Its score is a weighted sum of the rooms' scores and its shape factor.
+
+37
+00:03:19,376 --> 00:03:21,525
+这是当年分数最高的几个结果。
+These are some of the highest-scoring results from back then.
+
+38
+00:03:25,025 --> 00:03:31,424
+把平面组件进行三维建模，就会产生三维预览图。以现在的工具，非常容易。
+Model the plan's components in three dimensions and you get a 3D preview. With today's tools, that is very easy.
+
+39
+00:03:31,874 --> 00:03:34,904
+作为一个试验，它初步实现了生成的能力。
+As an experiment, it has achieved a first working ability to generate.
+
+40
+00:03:39,004 --> 00:03:43,985
+当年，这些步骤分散在几个脚本里，评分的系数要到代码里去改。
+Back then these steps were spread over several scripts, and the scoring coefficients had to be changed inside the code.
+
+41
+00:03:44,435 --> 00:03:48,197
+现在，前端开发成本很低，我把它们收进一个网页：
+Today front-end development is cheap, so I gathered them into a single web page:
+
+42
+00:03:48,197 --> 00:03:53,758
+画样本，看拼图库，改参数，生成房间，组合户型，都在同一个界面里完成。
+draw samples, inspect the tile library, set parameters, generate rooms, combine apartments — all in one interface.
+
+43
+00:03:53,758 --> 00:03:57,193
+对它继续调试的直观性和效率，可以大大提高。
+Tuning it further becomes far more intuitive and efficient.
+
+44
+00:04:00,493 --> 00:04:06,184
+当年我睡在书房里，看着白板，苦心孤诣，花了两个月的业余时间搞这个。
+Back then I slept in my study, staring at the whiteboard, and spent two months of spare time working this out.
+
+45
+00:04:06,634 --> 00:04:10,734
+而且，我一直知道，这里面有过多可以改进的技术。
+And I have always known that a great deal in it could be improved technically.
+
+46
+00:04:11,184 --> 00:04:14,498
+不过，我认为这个方法对于户型的理解非常本质，
+Still, I think this method gets at something essential about apartment layouts.
+
+47
+00:04:14,498 --> 00:04:18,264
+希望它能帮助有兴趣的同学们，增进对这类问题的理解。
+I hope it helps interested students understand this kind of problem better.
+
+48
+00:04:18,264 --> 00:04:20,825
+在这个层面上，它还是具有一些潜力。
+At that level, it still has some potential.

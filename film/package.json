@@ -1,0 +1,13 @@
+{
+  "name": "wfc-floor-plan-film",
+  "private": true,
+  "description": "Renders the introduction film for the WFC floor plan generator",
+  "scripts": {
+    "screens": "node capture_screens.js",
+    "film": "node make_film.js"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.60",
+    "puppeteer-core": "^23.0.0"
+  }
+}

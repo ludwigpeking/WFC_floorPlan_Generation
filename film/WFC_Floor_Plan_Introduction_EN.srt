@@ -1,0 +1,191 @@
+1
+00:00:00,900 --> 00:00:08,372
+Today I'd like to introduce an independent study I did in 2022: a way of generating apartment floor plans by computer.
+
+2
+00:00:08,822 --> 00:00:13,974
+The core algorithm is called wave function collapse — WFC for short.
+
+3
+00:00:16,474 --> 00:00:25,124
+The algorithm was proposed by Maxim Gumin. It relies on only two things: randomness, and local constraints between neighbouring cells.
+
+4
+00:00:25,574 --> 00:00:30,155
+So it does not depend on past experience, and can produce entirely new designs.
+
+5
+00:00:30,605 --> 00:00:37,070
+Starting from the basic logic of furniture and ergonomics, it generates the whole plan from the bottom up.
+
+6
+00:00:38,970 --> 00:00:44,186
+Wave function collapse is not good at large grids with highly specific requirements.
+
+7
+00:00:44,186 --> 00:00:47,540
+In our case, efficiency and detail cannot both be had.
+
+8
+00:00:47,990 --> 00:00:52,133
+So the choice of grid is a crucial question here.
+
+9
+00:00:52,133 --> 00:00:56,616
+Instead of the usual 20 or 30 cm grid, I chose 55 cm.
+
+10
+00:00:57,066 --> 00:01:06,464
+That is the width of a standing person including both arms — and close to the depth of a wardrobe, the narrowest passage, and the depth of a kitchen counter.
+
+11
+00:01:06,914 --> 00:01:12,307
+On this grid, wall thickness rounds to zero cells, and a door rounds to two cells wide.
+
+12
+00:01:14,207 --> 00:01:17,857
+The method I use first turns the plan into pixels.
+
+13
+00:01:18,307 --> 00:01:25,144
+Bed, wardrobe, passage, door, window: every cell gets a code, which is to say a colour.
+
+14
+00:01:25,594 --> 00:01:30,718
+Any four neighbouring cells form one tile: four corners, each carrying a colour.
+
+15
+00:01:32,618 --> 00:01:37,119
+The possible connections are vast, and defining them by hand is easily buggy.
+
+16
+00:01:37,569 --> 00:01:45,482
+So the library of connections is extracted automatically from samples. It can be seen as a kind of machine learning.
+
+17
+00:01:45,482 --> 00:01:50,735
+However, the completeness of the sample library limits what can be generated.
+
+18
+00:01:51,185 --> 00:01:56,866
+Nineteen bedroom samples yield 179 connections, and how often each one occurs.
+
+19
+00:01:59,366 --> 00:02:04,459
+Generating a room starts from a door, because a room always has an entrance.
+
+20
+00:02:04,459 --> 00:02:07,676
+That position is certain, so it collapses first.
+
+21
+00:02:08,126 --> 00:02:13,296
+The other positions are still in superposition, but we can compute their entropy.
+
+22
+00:02:13,296 --> 00:02:21,465
+Entropy here is a concept from information theory: the more concentrated the possibilities at a position, the lower its entropy.
+
+23
+00:02:21,915 --> 00:02:29,256
+At each step the entropy of every open position is computed, and the one with the lowest entropy collapses into a valid tile.
+
+24
+00:02:29,256 --> 00:02:32,662
+If several positions tie, one of them is chosen at random.
+
+25
+00:02:33,112 --> 00:02:36,186
+A dead end with no solution means starting over.
+
+26
+00:02:36,636 --> 00:02:41,377
+Most attempts fail. Only with a small probability does a room close.
+
+27
+00:02:46,877 --> 00:02:51,800
+A closed room is then scored. The score is a weighted sum of several aspects.
+
+28
+00:02:52,250 --> 00:02:56,221
+First, the ratio of perimeter to area: the smaller the better.
+
+29
+00:02:56,221 --> 00:03:01,730
+This steers a room towards a compact, square shape — but it is not the only criterion.
+
+30
+00:03:02,180 --> 00:03:09,621
+Second, a reasonable area. The area score rises, then falls: past a suitable size it drops again.
+
+31
+00:03:09,621 --> 00:03:15,451
+Upscale housing is more generous with space, so its score drops more slowly.
+
+32
+00:03:15,901 --> 00:03:20,172
+Third, storage: the more the better, with diminishing returns.
+
+33
+00:03:24,272 --> 00:03:29,391
+Bedroom, bathroom, kitchen, living room: each is generated and scored on its own.
+
+34
+00:03:29,391 --> 00:03:32,867
+The living room becomes the hub of the whole apartment.
+
+35
+00:03:33,317 --> 00:03:39,473
+The high-scoring rooms are kept and attached to the openings reserved in the living room, forming a complete apartment.
+
+36
+00:03:39,473 --> 00:03:43,094
+Its score is a weighted sum of the rooms' scores and its shape factor.
+
+37
+00:03:43,544 --> 00:03:46,314
+These are some of the highest-scoring results from back then.
+
+38
+00:03:49,814 --> 00:03:56,534
+Model the plan's components in three dimensions and you get a 3D preview. With today's tools, that is very easy.
+
+39
+00:03:56,984 --> 00:04:01,110
+As an experiment, it has achieved a first working ability to generate.
+
+40
+00:04:05,210 --> 00:04:12,046
+Back then these steps were spread over several scripts, and the scoring coefficients had to be changed inside the code.
+
+41
+00:04:12,496 --> 00:04:17,440
+Today front-end development is cheap, so I gathered them into a single web page:
+
+42
+00:04:17,440 --> 00:04:24,486
+draw samples, inspect the tile library, set parameters, generate rooms, combine apartments — all in one interface.
+
+43
+00:04:24,486 --> 00:04:28,132
+Tuning it further becomes far more intuitive and efficient.
+
+44
+00:04:31,432 --> 00:04:38,084
+Back then I slept in my study, staring at the whiteboard, and spent two months of spare time working this out.
+
+45
+00:04:38,534 --> 00:04:43,530
+And I have always known that a great deal in it could be improved technically.
+
+46
+00:04:43,980 --> 00:04:48,406
+Still, I think this method gets at something essential about apartment layouts.
+
+47
+00:04:48,406 --> 00:04:52,607
+I hope it helps interested students understand this kind of problem better.
+
+48
+00:04:52,607 --> 00:04:55,016
+At that level, it still has some potential.

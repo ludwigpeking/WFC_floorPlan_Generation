@@ -1,0 +1,14 @@
+# the films themselves (rebuilt by film/make_film.js)
+*.mp4
+
+# film build: dependencies, caches and everything that can be regenerated
+film/node_modules/
+film/preview/
+film/*.log
+film/material_cache.json
+film/renders/
+film/cover/
+film/photos/
+
+# licensed title font for the covers
+film/fonts/

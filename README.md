@@ -71,6 +71,40 @@ _Generation results with high fitness values._
 
 ## Usage
 
+### The single-page studio (2026)
+
+Open `index.html` in a browser. Nothing to install: the samples, the generator and the drawing code are all inside that one file. The four tabs follow the procedure described below.
+
+1. **Samples** – draw or edit the cases the generator learns from (the old `design.py`). Pick an element, rotate it with `R`, flip it with `F`, click to stamp. Samples can be imported and exported as CSV in the original format.
+2. **Tile library** – every 2 × 2 window of every sample, with its frequency (the old `blocks.py`).
+3. **Generate rooms** – the collapse itself (the old `jigsaw.py` scripts). Grid size, count rules, score threshold and every coefficient of the fitness curves are inputs on the page. "Watch the collapse" replays attempts step by step; "Refine" regrows half of each good scheme.
+4. **Combine apartment** – attaches two bedrooms, a bathroom and a kitchen to the access openings of each living room (the old `05 - combine`). Only apartments above the score threshold are kept (12 by default), every window must have a clear view, no gap may be enclosed between rooms, and one apartment is kept per living room so the list stays varied.
+5. **3D collection** – the kept apartments and rooms as abstract models: walls cut low, furniture and fixtures reduced to simple blocks. The same 3D view is available in every gallery and in the detail view, where the model can be dragged round.
+
+Schemes whose drawings are the same (window positions aside) are kept only once. Any scheme can be exported as PNG, DXF or CSV, and the whole session can be saved to and loaded from one JSON file. "Generate all four room types now" on the Combine tab runs the complete pipeline.
+
+Drawings use the furniture, fixture and door blocks of the 2022 `blocks.dxf` files (flattened and stored inside the page), placed by the same rules as the original `dxf_blocks.py` scripts: bedrooms and the entrance get the wide door, bathroom and kitchen the narrow one, and a door's two-cell opening includes its wall stubs and frame.
+
+The page is a re-implementation in JavaScript, not a wrapper around the Python scripts. It keeps their method – door first, lowest entropy next, frequency-weighted choice, the same fitness formulas and default coefficients – but replaces the per-room special cases with one generator driven by count rules, so its results are not identical to the 2022 output.
+
+### The introduction film
+
+`film/WFC_Floor_Plan_Introduction.mp4` is a short narrated introduction (Chinese narration, Chinese and English subtitles). The narration text is in `film/narration.json` (`text` is spoken, `zh`/`en` are the subtitles, `parts` splits a long line into several subtitles), the voice clips in `film/voice/` (synthesized at speech rate 25, i.e. 1.25×), and the notebook and whiteboard photos in `img/photos/`.
+
+To rebuild it, in `film/`:
+
+1. `npm install`
+2. `node capture_screens.js` – screenshots of the page (needs Chrome)
+3. `node make_film.js --refresh --preview 1` – generates the rooms and apartments once and caches them
+4. `node export_models.js`, then `blender -b -P render_models.py -- hero` and `blender -b -P render_models.py -- grid` – the 3D chapter, rendered with Blender Cycles
+5. `node make_film.js` – draws every frame and encodes the film (needs ffmpeg)
+
+`node make_film.js --language en` makes the English version, `film/WFC_Floor_Plan_Introduction_EN.mp4`: English narration from `film/voice-en/` (the `text_en` field of `narration.json`, synthesized at speech rate 15), with English-only captions and subtitles.
+
+`node make_cover.js` draws the covers in `film/cover/`, landscape and portrait, in Chinese and in English (`cover_en_*`). It needs the two stills from `blender -b -P render_models.py -- cover`, and sets the title in the font file found in `film/fonts/`.
+
+### The original Python scripts (2022)
+
 Although this project does not contain a large amount of complicated code, it has not yet solved the problem of being user-friendly and is still under development. This note is intended to help readers understand the project's procedure.
 
 ### Steps
